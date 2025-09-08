@@ -1,10 +1,7 @@
-# Write your code here
-$AllDisks = Get-AzDisk -ResourceGroupName 'mate-azure-task-5'
-$disks = @()
-foreach ($disk in $AllDisks) {
-    if ($disk.ManagedBy -eq $null) {
-        $disk = $disk | ConvertTo-Json
-        $disks += $disk
-    }
+$allDisks = Get-AzDisk -ResourceGroupName 'mate-azure-task-5'
+$unattached = $allDisks | Where-Object { -not $_.ManagedBy -or $_.DiskState -eq 'Unattached' }
+if (-not $unattached) {
+    $unattached = @()
 }
-Out-File -FilePath result.json -InputObject $disks
+$json = $unattached | ConvertTo-Json -Depth 10
+Out-File -FilePath 'result.json' -InputObject $json -Encoding utf8
